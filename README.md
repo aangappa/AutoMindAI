@@ -1,4 +1,24 @@
 # AutoMind AI 🚗🤖
+🚗 AutoMind
+
+An AI-powered Automotive Decision Intelligence Platform.
+
+Status:
+🚧 Under Active Development
+
+Current Phase:
+Product Architecture & MVP Development
+
+Planned Features:
+• Natural AI Consultation
+• Customer Profile & DNA
+• Vehicle Intelligence
+• Explainable Recommendation Engine
+
+Note:
+This project is under active development. Features and architecture will evolve as the MVP progresses.
+
+---------------
 AI Automotive Decision Platform
 
 > **Helping people buy the right car, not the most popular one.**
