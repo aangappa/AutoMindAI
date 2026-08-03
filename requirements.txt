@@ -1,0 +1,17 @@
+streamlit
+
+google-genai
+
+python-dotenv
+
+pydantic
+
+requests
+
+pandas
+
+faiss-cpu
+
+sentence-transformers
+
+numpy

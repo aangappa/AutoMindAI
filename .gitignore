@@ -1,14 +1,13 @@
-# Python
-__pycache__/
-*.pyc
 .venv/
+
+__pycache__/
+
+*.pyc
+
 .env
 
-# VS Code
 .vscode/
 
-# macOS
-.DS_Store
+.idea/
 
-# Logs
 *.log
