@@ -1,7 +1,14 @@
 import streamlit as st
+from customer.profile_extractor import ProfileExtractor
+
+from conversation.consultation_state import (
+    initialize_consultation,
+)
 
 
 def show_consultation():
+
+    initialize_consultation()
 
     st.title("🚗 AutoMind")
 
@@ -9,21 +16,39 @@ def show_consultation():
 
     st.divider()
 
-    with st.chat_message("assistant"):
+    for message in st.session_state.consultation_messages:
 
-        st.markdown(
-            """
-Welcome to **AutoMind**.
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-I'm your Automotive Decision Companion.
-
-Rather than asking you to fill out forms,
-I'd like to understand your needs through a conversation.
-
-Tell me a little about yourself and the kind of vehicle you're looking for.
-"""
-        )
-
-    st.chat_input(
+    prompt = st.chat_input(
         "Tell me about yourself..."
     )
+
+    if prompt:
+
+        st.session_state.consultation_messages.append(
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        )
+
+        # Update customer profile
+        profile = st.session_state.customer_profile
+
+        extractor = ProfileExtractor()
+
+        extractor.extract(prompt, profile)
+
+        st.session_state.consultation_messages.append(
+            {
+                "role": "assistant",
+                "content": (
+                    "Thank you! I've started understanding your requirements.\n\n"
+                    "We'll continue building your automotive profile before recommending a vehicle."
+                ),
+            }
+        )
+
+        st.rerun()

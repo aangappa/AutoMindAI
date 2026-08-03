@@ -1,20 +1,35 @@
 import streamlit as st
 
 
+def value(v):
+
+    return v if v else "Not Known"
+
+
 def show_sidebar():
+
+    profile = st.session_state.customer_profile
 
     st.header("🧠 Customer Understanding")
 
-    st.progress(5)
+    st.divider()
 
-    st.write("**Overall Profile**")
+    st.write("### Budget")
 
-    st.write("🏠 Lifestyle")
+    st.write(value(profile.budget))
 
-    st.write("🚗 Driving")
+    st.write("### Children")
 
-    st.write("💰 Ownership")
+    st.write(value(profile.children))
 
-    st.write("❤️ Preferences")
+    st.write("### Transmission")
 
-    st.write("🧬 Decision DNA")
+    st.write(value(profile.transmission))
+
+    st.write("### Fuel")
+
+    st.write(value(profile.fuel_type))
+
+    st.write("### Body Style")
+
+    st.write(value(profile.body_style))

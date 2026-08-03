@@ -2,6 +2,7 @@ import streamlit as st
 
 from ui.consultation import show_consultation
 from ui.sidebar import show_sidebar
+from conversation.consultation_state import initialize_consultation
 
 
 def show_home():
@@ -11,6 +12,8 @@ def show_home():
         page_icon="🚗",
         layout="wide"
     )
+
+    initialize_consultation()
 
     left, right = st.columns([1, 3])
 
