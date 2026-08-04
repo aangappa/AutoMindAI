@@ -6,6 +6,8 @@ python-dotenv
 
 pydantic
 
+pydantic-settings
+
 requests
 
 pandas
