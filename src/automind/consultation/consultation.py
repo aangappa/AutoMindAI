@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-
+from uuid import uuid4
 from consultation.consultation_state import ConsultationState
 from consultation.consultation_message import ConsultationMessage
 from customer.customer_profile import CustomerProfile
@@ -16,9 +16,9 @@ class Consultation:
     kept outside this class.
     """
 
-    consultation_id: str
+    consultation_id: str = field(default_factory=lambda: str(uuid4()))
 
-    customer_profile: CustomerProfile
+    customer_profile: CustomerProfile = field(default_factory=CustomerProfile)
 
     state: ConsultationState = ConsultationState.STARTED
 
