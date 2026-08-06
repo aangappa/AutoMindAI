@@ -29,7 +29,7 @@ Defines the major phases of the consultation process.
 ---
 
 ## Layer 5
-Methods
+Consultation Methodology
 
 Defines how each consultation phase is performed.
 

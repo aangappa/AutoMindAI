@@ -1,0 +1,37 @@
+phase: Discover
+
+purpose: >
+  Build sufficient understanding of the customer before
+  attempting diagnosis or making vehicle recommendations.
+
+information:
+
+  critical:
+
+    - field: budget
+      label: Budget
+
+    - field: body_style
+      label: Body Style
+
+    - field: annual_running
+      label: Annual Running
+
+    - field: ownership_years
+      label: Planned Ownership Period
+
+  important:
+
+    - field: fuel_type
+      label: Fuel Preference
+
+    - field: transmission
+      label: Transmission
+
+  optional:
+
+    - field: marital_status
+      label: Marital Status
+
+    - field: children
+      label: Passenger Composition

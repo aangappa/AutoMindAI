@@ -1,29 +1,55 @@
-from dataclasses import dataclass, field
-from datetime import datetime
-from uuid import uuid4
-from consultation.consultation_state import ConsultationState
-from consultation.consultation_message import ConsultationMessage
-from customer.customer_profile import CustomerProfile
+import streamlit as st
+
+from consultation.consultation_engine import ConsultationEngine
+from consultation.consultation_state import (
+    initialize_consultation,
+)
 
 
-@dataclass
-class Consultation:
-    """
-    Represents a single automotive consultation session.
+def show_consultation():
 
-    A consultation contains the customer profile, conversation history,
-    consultation state, and timestamps. Business logic is intentionally
-    kept outside this class.
-    """
+    initialize_consultation()
 
-    consultation_id: str = field(default_factory=lambda: str(uuid4()))
+    st.title("🚗 AutoMind")
 
-    customer_profile: CustomerProfile = field(default_factory=CustomerProfile)
+    st.subheader(
+        "Your Automotive Decision Companion"
+    )
 
-    state: ConsultationState = ConsultationState.STARTED
+    st.divider()
 
-    conversation_history: list[ConsultationMessage] = field(default_factory=list)
+    for message in st.session_state.consultation_messages:
 
-    created_at: datetime = field(default_factory=datetime.now)
+        with st.chat_message(message["role"]):
 
-    updated_at: datetime = field(default_factory=datetime.now)
+            st.markdown(message["content"])
+
+    prompt = st.chat_input(
+        "Tell me about yourself..."
+    )
+
+    if prompt:
+
+        st.session_state.consultation_messages.append(
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        )
+
+        engine = ConsultationEngine()
+
+        response = engine.process_message(
+            user_message=prompt,
+            profile=st.session_state.customer_profile,
+            conversation_history=st.session_state.consultation_messages,
+        )
+
+        st.session_state.consultation_messages.append(
+            {
+                "role": "assistant",
+                "content": response,
+            }
+        )
+
+        st.rerun()  

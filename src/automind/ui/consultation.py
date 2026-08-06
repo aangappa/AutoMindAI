@@ -1,7 +1,6 @@
 import streamlit as st
-from customer.profile_extractor import ProfileExtractor
-from consultation.consultation_engine import ConsultationEngine
 
+from consultation.consultation_engine import ConsultationEngine
 from consultation.consultation_state import (
     initialize_consultation,
 )
@@ -28,6 +27,7 @@ def show_consultation():
 
     if prompt:
 
+        # Add the user's message first
         st.session_state.consultation_messages.append(
             {
                 "role": "user",
@@ -35,18 +35,19 @@ def show_consultation():
             }
         )
 
-        # Update customer profile
         engine = ConsultationEngine()
 
         response = engine.process_message(
-        prompt,
-        st.session_state.customer_profile,
-                                        )
+            user_message=prompt,
+            profile=st.session_state.customer_profile,
+            conversation_history=st.session_state.consultation_messages,
+        )
 
+        # Add the assistant's response
         st.session_state.consultation_messages.append(
-          {
-             "role": "assistant",
-             "content": response,
+            {
+                "role": "assistant",
+                "content": response,
             }
         )
 

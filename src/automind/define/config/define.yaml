@@ -1,0 +1,51 @@
+phase: Define
+
+sections:
+
+  - id: priorities
+
+    objective: >
+      Understand what the customer values
+      most when purchasing a vehicle.
+
+    questions:
+
+      - What matters most to you when choosing a vehicle?
+
+      - If you had to choose, would you prioritize safety, comfort or performance?
+
+  - id: ownership
+
+    objective: >
+      Understand ownership behaviour.
+
+    questions:
+
+      - How long do you usually keep a vehicle?
+
+  - id: technology
+
+    objective: >
+      Understand technology adoption.
+
+    questions:
+
+      - Do you enjoy the latest automotive technology?
+
+  - id: brand
+
+    objective: >
+      Understand brand behaviour.
+
+    questions:
+
+      - Are you loyal to one brand?
+
+  - id: budget
+
+    objective: >
+      Understand budget flexibility.
+
+    questions:
+
+      - Would you stretch your budget for the right vehicle?
