@@ -28,10 +28,7 @@ information:
     - field: transmission
       label: Transmission
 
-  optional:
-
-    - field: marital_status
-      label: Marital Status
-
     - field: children
       label: Passenger Composition
+
+  optional: []

@@ -1,38 +1,155 @@
 from dataclasses import dataclass, field
 
+from models.dna_dimension import DNADimension
+
 
 @dataclass
 class CustomerDNA:
     """
-    Represents how a customer makes
-    vehicle purchasing decisions.
+    Represents the consultant's behavioural
+    understanding of the customer.
 
-    Produced by the Define phase.
+    CustomerDNA is the aggregate root of the
+    behavioural knowledge model.
     """
 
-    # Primary priorities (ordered)
-    decision_priorities: list[str] = field(default_factory=list)
+    # ------------------------------------
+    # Behavioural Dimensions
+    # ------------------------------------
 
-    # Lifestyle
-    lifestyle: str | None = None
+    dimensions: dict[str, DNADimension] = field(
+        default_factory=dict
+    )
 
-    # Driving pattern
-    driving_pattern: str | None = None
+    # ------------------------------------
+    # Consultation Metrics
+    # ------------------------------------
 
-    # Ownership behaviour
-    ownership_style: str | None = None
+    overall_confidence: int = 0
 
-    # Technology adoption
-    technology_preference: str | None = None
+    completeness: int = 0
 
-    # Brand behaviour
-    brand_preference: str | None = None
+    created_at: str | None = None
 
-    # Purchase behaviour
-    budget_flexibility: str | None = None
+    last_updated: str | None = None
 
-    # Risk profile
-    risk_profile: str | None = None
+    framework_version: str = "1.0"
 
-    # Environmental attitude
-    sustainability_preference: str | None = None
+    # ------------------------------------
+    # Dimension Operations
+    # ------------------------------------
+
+    def get_dimension(
+        self,
+        name: str,
+    ) -> DNADimension | None:
+
+        return self.dimensions.get(
+            name
+        )
+
+    def add_dimension(
+        self,
+        dimension: DNADimension,
+    ) -> None:
+
+        self.dimensions[
+            dimension.name
+        ] = dimension
+
+    def has_dimension(
+        self,
+        name: str,
+    ) -> bool:
+
+        return (
+            name in self.dimensions
+        )
+
+    # ------------------------------------
+    # DNA Metrics
+    # ------------------------------------
+
+    def calculate_overall_confidence(
+        self,
+    ) -> int:
+
+        if not self.dimensions:
+
+            return 0
+
+        total = sum(
+
+            dimension.confidence
+
+            for dimension in self.dimensions.values()
+
+        )
+
+        self.overall_confidence = int(
+
+            total / len(self.dimensions)
+
+        )
+
+        return self.overall_confidence
+
+    def calculate_completeness(
+        self,
+    ) -> int:
+
+        if not self.dimensions:
+
+            return 0
+
+        confirmed = 0
+
+        for dimension in self.dimensions.values():
+
+            if dimension.knowledge_state in [
+
+                "Emerging",
+
+                "Confirmed",
+
+                "Stable",
+
+            ]:
+
+                confirmed += 1
+
+        self.completeness = int(
+
+            confirmed
+            / len(self.dimensions)
+            * 100
+
+        )
+
+        return self.completeness
+
+    # ------------------------------------
+    # Reporting
+    # ------------------------------------
+
+    def summary(
+        self,
+    ) -> dict:
+
+        self.calculate_overall_confidence()
+
+        self.calculate_completeness()
+
+        return {
+
+            "dimensions": len(
+                self.dimensions
+            ),
+
+            "overall_confidence":
+                self.overall_confidence,
+
+            "completeness":
+                self.completeness,
+
+        }

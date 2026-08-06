@@ -3,6 +3,7 @@ from ai.ai_gateway import AIGateway
 from consultation.consultation_context import ConsultationContext
 from conversation.interpreter import ConversationInterpreter
 from customer.profile_updater import ProfileUpdater
+from define.define_methodology import DefineMethodology
 from prompt.prompt_builder import PromptBuilder
 
 
@@ -10,10 +11,6 @@ class ConsultationEngine:
     """
     Coordinates the Automotive Consultation
     workflow.
-
-    This class contains no business logic.
-    It orchestrates the consultation
-    components.
     """
 
     def __init__(self):
@@ -24,21 +21,26 @@ class ConsultationEngine:
 
         self.discover = DiscoverMethodology()
 
+        self.define = DefineMethodology()
+
         self.ai_gateway = AIGateway()
 
     def process_message(
         self,
         user_message: str,
-        profile,
+        customer_profile,
+        customer_dna,
+        fact_repository,
         conversation_history,
-    ) -> str:
+    ) -> tuple[str, object]:
 
         # -----------------------------------
         # Create Consultation Context
         # -----------------------------------
 
         context = ConsultationContext(
-            customer_profile=profile,
+            customer_profile=customer_profile,
+            customer_dna=customer_dna,
             conversation_history=conversation_history,
         )
 
@@ -55,42 +57,61 @@ class ConsultationEngine:
 
         # -----------------------------------
         # Step 2
-        # Apply Updates
+        # Update Customer Profile
         # -----------------------------------
 
         if result.success:
 
             self.updater.apply(
-                profile,
+                customer_profile,
                 result.updates,
             )
 
-        context.customer_profile = profile
+        context.customer_profile = (
+            customer_profile
+        )
 
         # -----------------------------------
         # Step 3
-        # Build Discover Context
+        # Update Customer DNA
         # -----------------------------------
 
-        discover_context = self.discover.build_context(
-            profile,
-            user_message,
+        context.customer_dna = (
+            self.define.update_customer_dna(
+                customer_profile=context.customer_profile,
+                customer_dna=context.customer_dna,
+                fact_repository=fact_repository,
+                conversation_history=context.conversation_history,
+            )
         )
 
         # -----------------------------------
         # Step 4
-        # Build AI Prompt
+        # Build Discover Context
+        # -----------------------------------
+
+        discover_context = (
+            self.discover.build_context(
+                customer_profile,
+                user_message,
+            )
+        )
+
+        # -----------------------------------
+        # Step 5
+        # Build Discover Prompt
         # -----------------------------------
 
         prompt = PromptBuilder.build(
             "discover_prompt.md",
             {
-                "discover_context": discover_context,
+                "discover_context":
+                    discover_context,
             },
         )
 
         # -----------------------------------
-        # Step 5
+        # Step 6
         # Ask AI
         # -----------------------------------
 
@@ -100,9 +121,13 @@ class ConsultationEngine:
 
         if ai_result.success:
 
-            return ai_result.content
+            return (
+                ai_result.content,
+                context.customer_dna,
+            )
 
         return (
             "⚠️ AutoMind could not contact the AI service.\n\n"
-            f"Reason: {ai_result.error}"
+            f"Reason: {ai_result.error}",
+            context.customer_dna,
         )

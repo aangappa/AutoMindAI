@@ -22,10 +22,12 @@ def show_consultation():
 
         with st.chat_message(message["role"]):
 
-            st.markdown(message["content"])
+            st.markdown(
+                message["content"]
+            )
 
     prompt = st.chat_input(
-        "Tell me about yourself..."
+        "Tell me about your vehicle requirements..."
     )
 
     if prompt:
@@ -39,10 +41,29 @@ def show_consultation():
 
         engine = ConsultationEngine()
 
-        response = engine.process_message(
+        response, customer_dna = engine.process_message(
+
             user_message=prompt,
-            profile=st.session_state.customer_profile,
-            conversation_history=st.session_state.consultation_messages,
+
+            customer_profile=(
+                st.session_state.customer_profile
+            ),
+
+            customer_dna=(
+                st.session_state.customer_dna
+            ),
+
+            fact_repository=(
+                st.session_state.fact_repository
+            ),
+
+            conversation_history=(
+                st.session_state.consultation_messages
+            ),
+        )
+
+        st.session_state.customer_dna = (
+            customer_dna
         )
 
         st.session_state.consultation_messages.append(
@@ -52,4 +73,4 @@ def show_consultation():
             }
         )
 
-        st.rerun()  
+        st.rerun()

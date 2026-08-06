@@ -1,45 +1,45 @@
 from dataclasses import dataclass, field
 
+from models.customer_dna import CustomerDNA
 from customer.customer_profile import CustomerProfile
 
 
 @dataclass
 class ConsultationContext:
     """
-    Represents the complete state of
-    an ongoing customer consultation.
+    Shared consultation context passed
+    between all ACF phases.
+
+    This object represents the current
+    state of the consultation.
     """
 
-    # Customer
-    customer_profile: CustomerProfile
-
+    # ------------------------------------
     # Conversation
+    # ------------------------------------
+
     conversation_history: list = field(
         default_factory=list
     )
 
-    # Current ACF Phase
-    current_phase: str = "Discover"
-
-    # ACF Context
-    known_information: dict = field(
-        default_factory=dict
-    )
-
-    missing_information: dict = field(
-        default_factory=dict
-    )
-
-    valid_fields: str = ""
-
-    # Interpreter
-
     latest_user_message: str = ""
 
-    previous_assistant_message: str = ""
+    latest_assistant_message: str = ""
 
-    # Future
+    # ------------------------------------
+    # Knowledge Models
+    # ------------------------------------
 
-    target_field: str = ""
+    customer_profile: CustomerProfile | None = None
 
-    consultation_complete: bool = False
+    customer_dna: CustomerDNA = field(
+        default_factory=CustomerDNA
+    )
+
+    # ------------------------------------
+    # Consultation State
+    # ------------------------------------
+
+    current_phase: str = "Discover"
+
+    consultation_completed: bool = False

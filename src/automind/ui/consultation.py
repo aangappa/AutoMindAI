@@ -4,6 +4,7 @@ from consultation.consultation_engine import ConsultationEngine
 from consultation.consultation_state import (
     initialize_consultation,
 )
+from ui.workbench import show_workbench
 
 
 def show_consultation():
@@ -12,22 +13,26 @@ def show_consultation():
 
     st.title("🚗 AutoMind")
 
-    st.subheader("Your Automotive Decision Companion")
+    st.subheader(
+        "Your Automotive Decision Companion"
+    )
 
     st.divider()
 
     for message in st.session_state.consultation_messages:
 
         with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+
+            st.markdown(
+                message["content"]
+            )
 
     prompt = st.chat_input(
-        "Tell me about yourself..."
+        "Tell me about your vehicle requirements..."
     )
 
     if prompt:
 
-        # Add the user's message first
         st.session_state.consultation_messages.append(
             {
                 "role": "user",
@@ -37,13 +42,23 @@ def show_consultation():
 
         engine = ConsultationEngine()
 
-        response = engine.process_message(
+        response, customer_dna = engine.process_message(
+
             user_message=prompt,
-            profile=st.session_state.customer_profile,
-            conversation_history=st.session_state.consultation_messages,
+
+            customer_profile=st.session_state.customer_profile,
+
+            customer_dna=st.session_state.customer_dna,
+
+            fact_repository=st.session_state.fact_repository,
+
+            conversation_history=(
+                st.session_state.consultation_messages
+            ),
         )
 
-        # Add the assistant's response
+        st.session_state.customer_dna = customer_dna
+
         st.session_state.consultation_messages.append(
             {
                 "role": "assistant",
@@ -52,3 +67,7 @@ def show_consultation():
         )
 
         st.rerun()
+
+    st.divider()
+
+    show_workbench()
