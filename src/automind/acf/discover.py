@@ -158,6 +158,8 @@ class DiscoverMethodology:
 
         return context
 
+    # ---------------------------------------------------------
+
     def get_valid_fields(self) -> str:
         """
         Returns all valid ACF fields
@@ -184,4 +186,34 @@ class DiscoverMethodology:
 
         return "\n".join(lines)
 
-    
+    # ---------------------------------------------------------
+
+    def is_complete(
+        self,
+        profile: CustomerProfile,
+    ) -> bool:
+        """
+        Discover is complete when all
+        critical information has been
+        collected.
+        """
+
+        for item in self.config["information"]["critical"]:
+
+            field = item["field"]
+
+            value = getattr(
+                profile,
+                field,
+            )
+
+            if value in (
+                None,
+                "",
+                [],
+                {},
+            ):
+
+                return False
+
+        return True
