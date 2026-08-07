@@ -12,21 +12,17 @@ from mvc.importer.provider_factory import (
 
 
 class ImportRunner:
-    """
-    Executes provider imports
-    into the AutoMind
-    Canonical MVC.
-    """
 
-    def run_csv(
+    def run(
         self,
+        provider_name: str,
         csv_path: str,
     ) -> None:
 
         importer = (
             ProviderFactory.create(
 
-                provider_name="csv",
+                provider_name=provider_name,
 
                 csv_path=csv_path,
 
@@ -35,7 +31,7 @@ class ImportRunner:
 
         context = ProviderContext(
 
-            provider_name="csv",
+            provider_name=provider_name,
 
             provider_version="1.0",
 
@@ -108,8 +104,15 @@ class ImportRunner:
 
 if __name__ == "__main__":
 
-    ImportRunner().run_csv(
+    ImportRunner().run(
 
-        "src/automind/data/vehicles.csv"
+        provider_name="car_details_v4",
+
+        csv_path=(
+            "datasets/"
+            "kaggle/"
+            "vehicle_dataset/"
+            "car details v4.csv"
+        ),
 
     )

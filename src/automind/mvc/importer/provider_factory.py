@@ -1,7 +1,3 @@
-from pathlib import (
-    Path,
-)
-
 from mvc.importer.base_importer import (
     BaseImporter,
 )
@@ -10,14 +6,16 @@ from mvc.importer.csv_importer import (
     CSVImporter,
 )
 
+from mvc.importer.providers.car_details_v4_importer import (
+    CarDetailsV4Importer,
+)
+
 
 class ProviderFactory:
     """
-    Creates provider importers.
-
-    New providers can be added
-    without changing the import
-    pipeline.
+    Factory responsible for
+    creating provider-specific
+    importers.
     """
 
     @staticmethod
@@ -26,26 +24,30 @@ class ProviderFactory:
         **kwargs,
     ) -> BaseImporter:
 
-        provider = (
-            provider_name.lower()
+        provider_name = (
+            provider_name
+            .lower()
+            .strip()
         )
 
-        if provider == "csv":
-
-            csv_path = kwargs.get(
-                "csv_path",
-            )
-
-            if csv_path is None:
-
-                raise ValueError(
-                    "csv_path is required."
-                )
+        if provider_name == "csv":
 
             return CSVImporter(
-                Path(
-                    csv_path
-                )
+
+                csv_path=kwargs[
+                    "csv_path"
+                ],
+
+            )
+
+        if provider_name == "car_details_v4":
+
+            return CarDetailsV4Importer(
+
+                csv_path=kwargs[
+                    "csv_path"
+                ],
+
             )
 
         raise ValueError(
