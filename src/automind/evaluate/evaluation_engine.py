@@ -1,6 +1,9 @@
 from evaluate.evaluation_dimension import (
     EvaluationDimension,
 )
+from evaluate.evaluation_rules import (
+    EvaluationRules,
+)
 from models.customer_dna import CustomerDNA
 from models.vehicle import Vehicle
 from models.vehicle_evaluation import (
@@ -10,8 +13,8 @@ from models.vehicle_evaluation import (
 
 class EvaluationEngine:
     """
-    Evaluates a vehicle against the
-    customer's DNA.
+    Evaluates one vehicle against the
+    Customer DNA.
     """
 
     def evaluate(
@@ -62,50 +65,32 @@ class EvaluationEngine:
 
             )
 
-            if compatibility >= 80:
+            if EvaluationRules.is_strength(
+                compatibility
+            ):
 
                 evaluation.add_strength(
-
                     dimension.name
-
                 )
 
                 dimension.strength = True
 
-            elif compatibility <= 50:
+            elif EvaluationRules.is_concern(
+                compatibility
+            ):
 
                 evaluation.add_concern(
-
                     dimension.name
-
                 )
 
                 dimension.concern = True
 
         evaluation.calculate_overall_score()
 
-        if evaluation.overall_score >= 90:
-
-            evaluation.recommendation_level = (
-                "Excellent Match"
+        evaluation.recommendation_level = (
+            EvaluationRules.recommendation_level(
+                evaluation.overall_score
             )
-
-        elif evaluation.overall_score >= 75:
-
-            evaluation.recommendation_level = (
-                "Good Match"
-            )
-
-        elif evaluation.overall_score >= 60:
-
-            evaluation.recommendation_level = (
-                "Possible Match"
-            )
-
-        else:
-
-            evaluation.recommendation_level = (
-                "Poor Match"
-            )
+        )
 
         return evaluation

@@ -4,8 +4,9 @@ from dataclasses import dataclass, field
 @dataclass
 class VehicleEvaluation:
     """
-    Represents the evaluation of one vehicle
-    against the customer's DNA.
+    Represents the evaluation of a
+    single vehicle against the
+    Customer DNA.
     """
 
     vehicle_id: str
@@ -16,7 +17,10 @@ class VehicleEvaluation:
 
     recommendation_level: str = "Not Evaluated"
 
-    dimension_scores: dict[str, float] = field(
+    dimension_scores: dict[
+        str,
+        float,
+    ] = field(
         default_factory=dict
     )
 
@@ -30,20 +34,26 @@ class VehicleEvaluation:
 
     explanation: str = ""
 
+    evaluated_dimensions: int = 0
+
     def add_dimension_score(
         self,
         dimension: str,
         score: float,
-    ):
+    ) -> None:
 
         self.dimension_scores[
             dimension
         ] = score
 
+        self.evaluated_dimensions = len(
+            self.dimension_scores
+        )
+
     def add_strength(
         self,
         strength: str,
-    ):
+    ) -> None:
 
         if strength not in self.strengths:
 
@@ -54,7 +64,7 @@ class VehicleEvaluation:
     def add_concern(
         self,
         concern: str,
-    ):
+    ) -> None:
 
         if concern not in self.concerns:
 
@@ -64,20 +74,22 @@ class VehicleEvaluation:
 
     def calculate_overall_score(
         self,
-    ):
+    ) -> float:
 
         if not self.dimension_scores:
 
             self.overall_score = 0
 
-            return
+            return self.overall_score
 
         self.overall_score = round(
 
             sum(
                 self.dimension_scores.values()
             )
+
             /
+
             len(
                 self.dimension_scores
             ),
@@ -85,3 +97,5 @@ class VehicleEvaluation:
             1,
 
         )
+
+        return self.overall_score

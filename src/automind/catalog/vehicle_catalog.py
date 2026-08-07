@@ -6,7 +6,8 @@ class VehicleCatalog:
     Temporary in-memory vehicle catalog.
 
     This will later be replaced by a
-    repository backed by YAML/Database.
+    repository backed by YAML and
+    eventually a database/API.
     """
 
     def get_all(self) -> list[Vehicle]:

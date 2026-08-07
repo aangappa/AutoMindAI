@@ -4,8 +4,8 @@ from evaluate.vehicle_matcher import (
 from models.customer_dna import (
     CustomerDNA,
 )
-from models.vehicle_evaluation import (
-    VehicleEvaluation,
+from models.evaluation_result import (
+    EvaluationResult,
 )
 
 
@@ -13,9 +13,12 @@ class EvaluateMethodology:
     """
     Implements the ACF Evaluate phase.
 
-    Evaluates the customer's DNA against
-    the vehicle catalog and returns the
-    highest-ranking vehicles.
+    Compares the Customer DNA against
+    every available vehicle and produces
+    an EvaluationResult.
+
+    This phase performs evaluation only.
+    It does not make recommendations.
     """
 
     def __init__(self):
@@ -27,13 +30,20 @@ class EvaluateMethodology:
     def evaluate(
         self,
         customer_dna: CustomerDNA,
-        top_n: int = 5,
-    ) -> list[VehicleEvaluation]:
+    ) -> EvaluationResult:
 
-        return self.matcher.match(
+        result = EvaluationResult()
 
-            customer_dna,
-
-            top_n,
-
+        evaluations = self.matcher.match(
+            customer_dna
         )
+
+        for evaluation in evaluations:
+
+            result.add(
+                evaluation
+            )
+
+        result.completed = True
+
+        return result
