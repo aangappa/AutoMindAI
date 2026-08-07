@@ -13,7 +13,7 @@ class RecommendMethodology:
     """
     Implements the ACF Recommend phase.
 
-    Converts Vehicle Evaluations into
+    Converts vehicle evaluations into
     customer-facing recommendations.
     """
 
@@ -28,8 +28,8 @@ class RecommendMethodology:
 
             evaluation_result.evaluations,
 
-            key=lambda vehicle:
-                vehicle.overall_score,
+            key=lambda item:
+                item.overall_score,
 
             reverse=True,
 
@@ -52,24 +52,37 @@ class RecommendMethodology:
                 title=vehicle.vehicle_name,
 
                 summary=(
-                    f"{vehicle.recommendation_level} "
-                    f"({vehicle.overall_score}/100)"
+
+                    f"{vehicle.recommendation_level}"
+
+                    f" • "
+
+                    f"{vehicle.overall_score:.0f}/100 Match"
+
                 ),
 
                 recommendation_level=(
+
                     vehicle.recommendation_level
+
                 ),
 
                 confidence=int(
-                    vehicle.overall_score
+
+                    vehicle.confidence_score
+
                 ),
 
                 why_recommended=list(
+
                     vehicle.strengths
+
                 ),
 
                 trade_offs=list(
-                    vehicle.concerns
+
+                    vehicle.tradeoffs
+
                 ),
 
                 ownership_highlights=[],
@@ -79,7 +92,9 @@ class RecommendMethodology:
             )
 
             result.add(
+
                 recommendation
+
             )
 
         result.completed = True

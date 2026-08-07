@@ -4,11 +4,14 @@ from akr.knowledge_pipeline import (
 from akr.knowledge_provider_manager import (
     KnowledgeProviderManager,
 )
+from akr.knowledge_record import (
+    KnowledgeRecord,
+)
+from akr.knowledge_record_repository import (
+    KnowledgeRecordRepository,
+)
 from akr.provider import (
     AutomotiveKnowledgeProvider,
-)
-from models.customer_dna import (
-    CustomerDNA,
 )
 from models.vehicle import (
     Vehicle,
@@ -18,8 +21,11 @@ from models.vehicle import (
 class VehicleRepository:
     """
     Repository responsible for
-    retrieving and enriching
-    vehicle information.
+    enriching vehicles with
+    automotive knowledge.
+
+    Knowledge is persisted inside
+    the KnowledgeRecordRepository.
     """
 
     def __init__(self):
@@ -30,6 +36,10 @@ class VehicleRepository:
 
         self.pipeline = (
             KnowledgePipeline()
+        )
+
+        self.records = (
+            KnowledgeRecordRepository()
         )
 
     def register_provider(
@@ -43,29 +53,32 @@ class VehicleRepository:
 
     def enrich(
         self,
-        customer_dna: CustomerDNA,
-    ) -> list[Vehicle]:
+        vehicle: Vehicle,
+    ) -> None:
 
         packages = (
-            self.providers.search_vehicles(
-                customer_dna
+            self.providers.enrich(
+                vehicle
             )
         )
 
-        vehicles: list[
-            Vehicle
-        ] = []
-
         for package in packages:
 
-            vehicle = self.pipeline.process(
-                package
+            records = (
+                self.pipeline.process(
+                    package
+                )
             )
 
-            if vehicle is not None:
+            self.records.save(
+                records
+            )
 
-                vehicles.append(
-                    vehicle
-                )
+    def find(
+        self,
+        vehicle_id: str,
+    ) -> list[KnowledgeRecord]:
 
-        return vehicles
+        return self.records.find(
+            vehicle_id
+        )

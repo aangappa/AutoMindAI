@@ -4,21 +4,19 @@ from akr.knowledge_package import (
 from akr.provider import (
     AutomotiveKnowledgeProvider,
 )
-from models.customer_dna import (
-    CustomerDNA,
+from models.vehicle import (
+    Vehicle,
 )
 
 
 class KnowledgeProviderManager:
     """
-    Coordinates all Automotive
-    Knowledge Providers.
+    Coordinates Automotive Knowledge
+    providers.
 
-    Providers return raw
-    Knowledge Packages.
-
-    No validation, normalization
-    or caching happens here.
+    Each registered provider enriches
+    the supplied vehicle and returns
+    a KnowledgePackage.
     """
 
     def __init__(self):
@@ -36,9 +34,9 @@ class KnowledgeProviderManager:
             provider
         )
 
-    def search_vehicles(
+    def enrich(
         self,
-        customer_dna: CustomerDNA,
+        vehicle: Vehicle,
     ) -> list[KnowledgePackage]:
 
         packages: list[
@@ -47,12 +45,14 @@ class KnowledgeProviderManager:
 
         for provider in self.providers:
 
-            packages.extend(
-
-                provider.search_vehicles(
-                    customer_dna
-                )
-
+            package = provider.enrich(
+                vehicle
             )
+
+            if package is not None:
+
+                packages.append(
+                    package
+                )
 
         return packages

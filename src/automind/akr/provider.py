@@ -1,36 +1,36 @@
-from abc import ABC
-from abc import abstractmethod
+from abc import (
+    ABC,
+    abstractmethod,
+)
 
 from akr.knowledge_package import (
     KnowledgePackage,
 )
-from models.customer_dna import (
-    CustomerDNA,
+from models.vehicle import (
+    Vehicle,
 )
 
 
-class AutomotiveKnowledgeProvider(
-    ABC
-):
+class AutomotiveKnowledgeProvider(ABC):
     """
-    Base class for every Automotive
-    Knowledge Provider.
+    Base interface for all Automotive
+    Knowledge providers.
 
-    Providers acquire raw automotive
-    knowledge only.
+    A provider enriches an already
+    identified vehicle.
 
-    They never normalize, enrich,
-    validate or cache knowledge.
+    Providers DO NOT discover vehicles.
+    That responsibility belongs to MVC.
     """
 
     @abstractmethod
-    def search_vehicles(
+    def enrich(
         self,
-        customer_dna: CustomerDNA,
-    ) -> list[KnowledgePackage]:
+        vehicle: Vehicle,
+    ) -> KnowledgePackage:
         """
-        Acquires candidate vehicle
-        knowledge from the underlying
-        source.
+        Returns a KnowledgePackage
+        containing raw provider data
+        for the supplied vehicle.
         """
         pass

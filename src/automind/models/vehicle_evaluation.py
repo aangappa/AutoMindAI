@@ -1,4 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import (
+    dataclass,
+    field,
+)
 
 
 @dataclass
@@ -9,13 +12,43 @@ class VehicleEvaluation:
     Customer DNA.
     """
 
+    # -----------------------------
+    # Vehicle
+    # -----------------------------
+
     vehicle_id: str
 
     vehicle_name: str
 
+    # -----------------------------
+    # Evaluation
+    # -----------------------------
+
     overall_score: float = 0.0
 
-    recommendation_level: str = "Not Evaluated"
+    recommendation_level: str = (
+        "Not Evaluated"
+    )
+
+    confidence_score: float = 0.0
+
+    # -----------------------------
+    # Explanation
+    # -----------------------------
+
+    strengths: list[str] = field(
+        default_factory=list
+    )
+
+    tradeoffs: list[str] = field(
+        default_factory=list
+    )
+
+    explanation: str = ""
+
+    # -----------------------------
+    # Dimension Scores
+    # -----------------------------
 
     dimension_scores: dict[
         str,
@@ -24,17 +57,11 @@ class VehicleEvaluation:
         default_factory=dict
     )
 
-    strengths: list[str] = field(
-        default_factory=list
-    )
-
-    concerns: list[str] = field(
-        default_factory=list
-    )
-
-    explanation: str = ""
-
     evaluated_dimensions: int = 0
+
+    # -----------------------------
+    # Methods
+    # -----------------------------
 
     def add_dimension_score(
         self,
@@ -61,16 +88,26 @@ class VehicleEvaluation:
                 strength
             )
 
+    def add_tradeoff(
+        self,
+        tradeoff: str,
+    ) -> None:
+
+        if tradeoff not in self.tradeoffs:
+
+            self.tradeoffs.append(
+                tradeoff
+            )
+
+    # Backward compatibility
     def add_concern(
         self,
         concern: str,
     ) -> None:
 
-        if concern not in self.concerns:
-
-            self.concerns.append(
-                concern
-            )
+        self.add_tradeoff(
+            concern
+        )
 
     def calculate_overall_score(
         self,
@@ -80,6 +117,8 @@ class VehicleEvaluation:
 
             self.overall_score = 0
 
+            self.confidence_score = 0
+
             return self.overall_score
 
         self.overall_score = round(
@@ -87,12 +126,22 @@ class VehicleEvaluation:
             sum(
                 self.dimension_scores.values()
             )
-
             /
-
             len(
                 self.dimension_scores
             ),
+
+            1,
+
+        )
+
+        self.confidence_score = round(
+
+            (
+                self.evaluated_dimensions
+                / 10
+            )
+            * 100,
 
             1,
 

@@ -1,8 +1,8 @@
 from akr.knowledge_package import (
     KnowledgePackage,
 )
-from models.vehicle import (
-    Vehicle,
+from akr.knowledge_record import (
+    KnowledgeRecord,
 )
 
 
@@ -17,21 +17,18 @@ class KnowledgePipeline:
         ↓
     Normalize
         ↓
-    Enrich
-        ↓
-    Cache
-        ↓
-    Vehicle
+    KnowledgeRecord
     """
 
     def process(
         self,
         package: KnowledgePackage,
-    ) -> Vehicle | None:
+    ) -> list[KnowledgeRecord]:
 
-        if not self.validate(package):
-
-            return None
+        if not self.validate(
+            package
+        ):
+            return []
 
         return self.normalize(
             package
@@ -53,57 +50,32 @@ class KnowledgePipeline:
     def normalize(
         self,
         package: KnowledgePackage,
-    ) -> Vehicle:
+    ) -> list[KnowledgeRecord]:
 
-        data = package.raw_data
+        records: list[
+            KnowledgeRecord
+        ] = []
 
-        return Vehicle(
+        raw = package.raw_data
 
-            vehicle_id=str(
+        if isinstance(raw, dict):
 
-                data.get(
-                    "id",
-                    ""
+            records.append(
+
+                KnowledgeRecord(
+
+                    vehicle_id=package.vehicle_id,
+
+                    domain="vehicle",
+
+                    source=package.provider,
+
+                    confidence=100,
+
+                    data=raw,
+
                 )
 
-            ),
+            )
 
-            manufacturer=data.get(
-                "make",
-                ""
-            ),
-
-            model=data.get(
-                "model",
-                ""
-            ),
-
-            variant=data.get(
-                "trim",
-                ""
-            ),
-
-            year=data.get(
-                "year"
-            ),
-
-            body_style=data.get(
-                "body_type",
-                ""
-            ),
-
-            fuel_type=data.get(
-                "fuel_type",
-                ""
-            ),
-
-            transmission=data.get(
-                "transmission",
-                ""
-            ),
-
-            source=package.provider,
-
-            knowledge=data,
-
-        )
+        return records

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from akr.http_client import (
     HttpClient,
 )
@@ -19,11 +21,12 @@ class CarsXEProvider(
     AutomotiveKnowledgeProvider,
 ):
     """
-    CarsXE Automotive
-    Knowledge Provider.
+    CarsXE Automotive Knowledge Provider.
 
-    Enriches a known vehicle using
-    Year-Make-Model lookup.
+    Enriches a known vehicle with
+    automotive knowledge.
+
+    Vehicle discovery belongs to MVC.
     """
 
     BASE_URL = (
@@ -68,7 +71,15 @@ class CarsXEProvider(
 
         return KnowledgePackage(
 
+            vehicle_id=vehicle.vehicle_id,
+
             provider="CarsXE",
+
+            source=self.BASE_URL,
+
+            knowledge_type="vehicle",
+
+            acquired_at=datetime.utcnow().isoformat(),
 
             raw_data=response,
 

@@ -11,16 +11,14 @@ from models.vehicle_evaluation import (
 
 class EvaluationEngine:
     """
-    Evaluates one vehicle against
-    the current Customer DNA.
+    Evaluates one vehicle against the
+    current Customer DNA.
 
-    MVP version.
+    Evaluation is based on the
+    customer's known preferences.
 
-    Uses only attributes available
-    from MVC.
-
-    AKR enrichment will extend this
-    engine without changing its API.
+    AKR will enrich this engine in
+    future without changing its API.
     """
 
     def evaluate(
@@ -54,38 +52,93 @@ class EvaluationEngine:
 
             if (
                 fuel.explanation.lower()
-                != vehicle.fuel_type.lower()
+                == vehicle.fuel_type.lower()
             ):
 
-                score -= 20
-
-                evaluation.add_concern(
-                    "Fuel Preference"
+                evaluation.add_strength(
+                    f"Preferred {vehicle.fuel_type} powertrain."
                 )
 
             else:
 
+                score -= 20
+
+                evaluation.add_tradeoff(
+                    f"Uses {vehicle.fuel_type} instead of your preferred {fuel.explanation}."
+                )
+
+        # --------------------------
+        # Body Style
+        # --------------------------
+
+        body = customer_dna.get_dimension(
+            "Body Style"
+        )
+
+        if (
+            body
+            and body.knowledge_state != "Unknown"
+        ):
+
+            if (
+                body.explanation.lower()
+                == vehicle.body_style.lower()
+            ):
+
                 evaluation.add_strength(
-                    "Fuel Preference"
+                    f"{vehicle.body_style} matches your preferred body style."
+                )
+
+            else:
+
+                score -= 15
+
+                evaluation.add_tradeoff(
+                    f"{vehicle.body_style} instead of your preferred {body.explanation}."
+                )
+
+        # --------------------------
+        # Transmission
+        # --------------------------
+
+        transmission = customer_dna.get_dimension(
+            "Transmission"
+        )
+
+        if (
+            transmission
+            and transmission.knowledge_state != "Unknown"
+        ):
+
+            if (
+                transmission.explanation.lower()
+                == vehicle.transmission.lower()
+            ):
+
+                evaluation.add_strength(
+                    f"{vehicle.transmission} transmission matches your preference."
+                )
+
+            else:
+
+                score -= 10
+
+                evaluation.add_tradeoff(
+                    f"{vehicle.transmission} transmission differs from your preference."
                 )
 
         # --------------------------
         # Seating
         # --------------------------
 
-        seating = customer_dna.get_dimension(
-            "Family Size"
-        )
-
-        if (
-            seating
-            and vehicle.seating_capacity >= 5
-        ):
+        if vehicle.seating_capacity >= 5:
 
             evaluation.add_strength(
-                "Family Size"
+                f"Comfortably seats {vehicle.seating_capacity} passengers."
             )
 
+        # --------------------------
+        # Overall Score
         # --------------------------
 
         evaluation.overall_score = max(
@@ -93,28 +146,34 @@ class EvaluationEngine:
             0,
         )
 
+        evaluation.confidence_score = 90.0
+
         if evaluation.overall_score >= 90:
 
             evaluation.recommendation_level = (
-                "Excellent Match"
+                "★★★★★ Excellent Match"
             )
 
         elif evaluation.overall_score >= 75:
 
             evaluation.recommendation_level = (
-                "Good Match"
+                "★★★★ Good Match"
             )
 
         elif evaluation.overall_score >= 60:
 
             evaluation.recommendation_level = (
-                "Possible Match"
+                "★★★ Possible Match"
             )
 
         else:
 
             evaluation.recommendation_level = (
-                "Poor Match"
+                "★★ Not Recommended"
             )
+
+        evaluation.explanation = (
+            "Evaluation completed successfully."
+        )
 
         return evaluation

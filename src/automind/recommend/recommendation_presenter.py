@@ -20,7 +20,7 @@ class RecommendationPresenter:
 
             "",
 
-            "Based on your consultation, here are the vehicles that best match your requirements.",
+            "Based on your consultation, AutoMind evaluated the available vehicles and ranked them according to your preferences.",
 
             "",
 
@@ -36,13 +36,21 @@ class RecommendationPresenter:
 
                     f"## {recommendation.rank}. {recommendation.title}",
 
-                    f"**Overall Match:** {vehicle.overall_score:.1f}%",
-
-                    f"**Assessment:** {recommendation.recommendation_level}",
+                    f"### {recommendation.recommendation_level}",
 
                     "",
 
-                    "### Why this vehicle?",
+                    f"**Overall Match:** **{vehicle.overall_score:.1f}%**",
+
+                    f"**Confidence:** **{recommendation.confidence}%**",
+
+                    "",
+
+                    "---",
+
+                    "",
+
+                    "### ✅ Why AutoMind recommends this vehicle",
 
                 ]
 
@@ -54,7 +62,7 @@ class RecommendationPresenter:
 
                     lines.append(
 
-                        f"✅ {item}"
+                        f"- ✅ {item}"
 
                     )
 
@@ -62,7 +70,7 @@ class RecommendationPresenter:
 
                 lines.append(
 
-                    "No strengths identified."
+                    "- No specific strengths identified yet."
 
                 )
 
@@ -72,7 +80,7 @@ class RecommendationPresenter:
 
                     "",
 
-                    "### Trade-offs",
+                    "### ⚠️ Trade-offs",
 
                 ]
 
@@ -84,7 +92,7 @@ class RecommendationPresenter:
 
                     lines.append(
 
-                        f"⚠️ {item}"
+                        f"- ⚠️ {item}"
 
                     )
 
@@ -92,10 +100,66 @@ class RecommendationPresenter:
 
                 lines.append(
 
-                    "No significant trade-offs identified."
+                    "- No significant trade-offs identified."
 
                 )
 
-            lines.append("")
+            if recommendation.ownership_highlights:
+
+                lines.extend(
+
+                    [
+
+                        "",
+
+                        "### 🚘 Ownership Highlights",
+
+                    ]
+
+                )
+
+                for item in recommendation.ownership_highlights:
+
+                    lines.append(
+
+                        f"- {item}"
+
+                    )
+
+            if recommendation.not_recommended_reasons:
+
+                lines.extend(
+
+                    [
+
+                        "",
+
+                        "### ❌ Consider Before Buying",
+
+                    ]
+
+                )
+
+                for item in recommendation.not_recommended_reasons:
+
+                    lines.append(
+
+                        f"- {item}"
+
+                    )
+
+            lines.extend(
+
+                [
+
+                    "",
+
+                    "---",
+
+                    "",
+
+                ]
+
+            )
 
         return "\n".join(lines)

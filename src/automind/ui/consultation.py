@@ -12,92 +12,124 @@ from models.recommendation_result import (
 from recommend.recommendation_presenter import (
     RecommendationPresenter,
 )
-from ui.workbench import show_workbench
+from ui.theme import (
+    apply_theme,
+)
+from ui.workbench import (
+    show_workbench,
+)
 
 
 def show_consultation():
 
+    apply_theme()
+
     initialize_consultation()
 
-    st.title("🚗 AutoMind")
+    st.markdown(
+        "# 🚗 AutoMind"
+    )
 
-    st.subheader(
+    st.caption(
         "Your Automotive Decision Companion"
     )
 
     st.divider()
 
-    for message in (
-        st.session_state.consultation_messages
-    ):
-
-        with st.chat_message(
-            message["role"]
-        ):
-
-            st.markdown(
-                message["content"]
-            )
-
-    prompt = st.chat_input(
-        "Tell me about your vehicle requirements..."
+    left, right = st.columns(
+        [1, 3],
+        gap="large",
     )
 
-    if prompt:
+    # -------------------------------------------------
+    # Left Dashboard
+    # -------------------------------------------------
 
-        st.session_state.consultation_messages.append(
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        )
+    with left:
 
-        engine = ConsultationEngine()
+        show_workbench()
 
-        response, customer_dna = (
-            engine.process_message(
-                user_message=prompt,
-                customer_profile=(
-                    st.session_state.customer_profile
-                ),
-                customer_dna=(
-                    st.session_state.customer_dna
-                ),
-                fact_repository=(
-                    st.session_state.fact_repository
-                ),
-                conversation_history=(
-                    st.session_state.consultation_messages
-                ),
-            )
-        )
+    # -------------------------------------------------
+    # Main Conversation
+    # -------------------------------------------------
 
-        st.session_state.customer_dna = (
-            customer_dna
-        )
+    with right:
 
-        if isinstance(
-            response,
-            RecommendationResult,
+        for message in (
+            st.session_state.consultation_messages
         ):
 
-            presenter = (
-                RecommendationPresenter()
-            )
+            with st.chat_message(
+                message["role"]
+            ):
 
-            response = presenter.present(
-                response
-            )
+                st.markdown(
+                    message["content"]
+                )
 
-        st.session_state.consultation_messages.append(
-            {
-                "role": "assistant",
-                "content": response,
-            }
+        prompt = st.chat_input(
+            "Tell me about your vehicle requirements..."
         )
 
-        st.rerun()
+        if prompt:
 
-    st.divider()
+            st.session_state.consultation_messages.append(
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            )
 
-    show_workbench()
+            engine = ConsultationEngine()
+
+            response, customer_dna = (
+
+                engine.process_message(
+
+                    user_message=prompt,
+
+                    customer_profile=(
+                        st.session_state.customer_profile
+                    ),
+
+                    customer_dna=(
+                        st.session_state.customer_dna
+                    ),
+
+                    fact_repository=(
+                        st.session_state.fact_repository
+                    ),
+
+                    conversation_history=(
+                        st.session_state.consultation_messages
+                    ),
+
+                )
+
+            )
+
+            st.session_state.customer_dna = (
+                customer_dna
+            )
+
+            if isinstance(
+                response,
+                RecommendationResult,
+            ):
+
+                presenter = (
+                    RecommendationPresenter()
+                )
+
+                response = presenter.present(
+                    response
+                )
+
+            st.session_state.consultation_messages.append(
+                {
+                    "role": "assistant",
+                    "content": response,
+                }
+            )
+
+            st.rerun()
