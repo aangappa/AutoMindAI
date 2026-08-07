@@ -6,8 +6,11 @@ from consultation.consultation_engine import (
 from consultation.consultation_state import (
     initialize_consultation,
 )
-from models.evaluation_result import (
-    EvaluationResult,
+from models.recommendation_result import (
+    RecommendationResult,
+)
+from recommend.recommendation_presenter import (
+    RecommendationPresenter,
 )
 from ui.workbench import show_workbench
 
@@ -75,43 +78,15 @@ def show_consultation():
 
         if isinstance(
             response,
-            EvaluationResult,
+            RecommendationResult,
         ):
 
-            lines = [
+            presenter = (
+                RecommendationPresenter()
+            )
 
-                "# 🚗 Vehicle Evaluations",
-
-                "",
-
-            ]
-
-            for index, evaluation in enumerate(
-
-                response.ranked(),
-
-                start=1,
-
-            ):
-
-                lines.extend(
-
-                    [
-
-                        f"## {index}. {evaluation.vehicle_name}",
-
-                        f"Overall Score: {evaluation.overall_score}",
-
-                        f"Recommendation: {evaluation.recommendation_level}",
-
-                        "",
-
-                    ]
-
-                )
-
-            response = "\n".join(
-                lines
+            response = presenter.present(
+                response
             )
 
         st.session_state.consultation_messages.append(

@@ -14,18 +14,22 @@ from define.define_methodology import (
 from evaluate.evaluate_methodology import (
     EvaluateMethodology,
 )
+from recommend.recommend_methodology import (
+    RecommendMethodology,
+)
 
 
 class ACFEngine:
     """
-    Orchestrates the Automotive
-    Consulting Framework.
+    Automotive Consulting Framework.
 
     Discover
         ↓
     Define
         ↓
     Evaluate
+        ↓
+    Recommend
     """
 
     def __init__(self):
@@ -50,6 +54,10 @@ class ACFEngine:
             EvaluateMethodology()
         )
 
+        self.recommend = (
+            RecommendMethodology()
+        )
+
     def process(
         self,
         context: ConsultationContext,
@@ -71,33 +79,53 @@ class ACFEngine:
             )
 
         context.customer_dna = (
+
             self.define.update_customer_dna(
 
                 customer_profile=
-                context.customer_profile,
+                    context.customer_profile,
 
                 customer_dna=
-                context.customer_dna,
+                    context.customer_dna,
 
                 fact_repository=
-                fact_repository,
+                    fact_repository,
 
                 conversation_history=
-                context.conversation_history,
+                    context.conversation_history,
 
             )
+
         )
 
-        if self.discover.is_complete(
+        if not self.discover.is_complete(
 
             context.customer_profile
 
         ):
 
-            return self.evaluate.evaluate(
+            return None
 
-                context.customer_dna
+        evaluation_result = (
+
+            self.evaluate.evaluate(
+
+                context.customer_profile,
+
+                context.customer_dna,
 
             )
 
-        return None
+        )
+
+        recommendation_result = (
+
+            self.recommend.recommend(
+
+                evaluation_result
+
+            )
+
+        )
+
+        return recommendation_result

@@ -1,11 +1,9 @@
-from evaluate.evaluation_dimension import (
-    EvaluationDimension,
+from models.customer_dna import (
+    CustomerDNA,
 )
-from evaluate.evaluation_rules import (
-    EvaluationRules,
+from models.vehicle import (
+    Vehicle,
 )
-from models.customer_dna import CustomerDNA
-from models.vehicle import Vehicle
 from models.vehicle_evaluation import (
     VehicleEvaluation,
 )
@@ -13,8 +11,16 @@ from models.vehicle_evaluation import (
 
 class EvaluationEngine:
     """
-    Evaluates one vehicle against the
-    Customer DNA.
+    Evaluates one vehicle against
+    the current Customer DNA.
+
+    MVP version.
+
+    Uses only attributes available
+    from MVC.
+
+    AKR enrichment will extend this
+    engine without changing its API.
     """
 
     def evaluate(
@@ -25,72 +31,90 @@ class EvaluationEngine:
 
         evaluation = VehicleEvaluation(
 
-            vehicle_id=vehicle.id,
+            vehicle_id=vehicle.vehicle_id,
 
-            vehicle_name=vehicle.name(),
+            vehicle_name=vehicle.display_name,
 
         )
 
-        for dna_dimension in (
-            customer_dna.dimensions.values()
+        score = 100
+
+        # --------------------------
+        # Fuel Preference
+        # --------------------------
+
+        fuel = customer_dna.get_dimension(
+            "Fuel Preference"
+        )
+
+        if (
+            fuel
+            and fuel.knowledge_state != "Unknown"
         ):
 
-            vehicle_score = (
-                vehicle.get_dimension_score(
-                    dna_dimension.name
-                )
-            )
-
-            dimension = (
-                EvaluationDimension(
-
-                    name=dna_dimension.name,
-
-                    customer_score=dna_dimension.score,
-
-                    vehicle_score=vehicle_score,
-
-                )
-            )
-
-            compatibility = (
-                dimension.calculate_compatibility()
-            )
-
-            evaluation.add_dimension_score(
-
-                dimension.name,
-
-                compatibility,
-
-            )
-
-            if EvaluationRules.is_strength(
-                compatibility
+            if (
+                fuel.explanation.lower()
+                != vehicle.fuel_type.lower()
             ):
 
-                evaluation.add_strength(
-                    dimension.name
-                )
-
-                dimension.strength = True
-
-            elif EvaluationRules.is_concern(
-                compatibility
-            ):
+                score -= 20
 
                 evaluation.add_concern(
-                    dimension.name
+                    "Fuel Preference"
                 )
 
-                dimension.concern = True
+            else:
 
-        evaluation.calculate_overall_score()
+                evaluation.add_strength(
+                    "Fuel Preference"
+                )
 
-        evaluation.recommendation_level = (
-            EvaluationRules.recommendation_level(
-                evaluation.overall_score
-            )
+        # --------------------------
+        # Seating
+        # --------------------------
+
+        seating = customer_dna.get_dimension(
+            "Family Size"
         )
+
+        if (
+            seating
+            and vehicle.seating_capacity >= 5
+        ):
+
+            evaluation.add_strength(
+                "Family Size"
+            )
+
+        # --------------------------
+
+        evaluation.overall_score = max(
+            score,
+            0,
+        )
+
+        if evaluation.overall_score >= 90:
+
+            evaluation.recommendation_level = (
+                "Excellent Match"
+            )
+
+        elif evaluation.overall_score >= 75:
+
+            evaluation.recommendation_level = (
+                "Good Match"
+            )
+
+        elif evaluation.overall_score >= 60:
+
+            evaluation.recommendation_level = (
+                "Possible Match"
+            )
+
+        else:
+
+            evaluation.recommendation_level = (
+                "Poor Match"
+            )
 
         return evaluation

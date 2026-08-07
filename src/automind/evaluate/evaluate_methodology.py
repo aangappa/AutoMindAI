@@ -1,3 +1,6 @@
+from discovery.vehicle_discovery import (
+    VehicleDiscovery,
+)
 from evaluate.vehicle_matcher import (
     VehicleMatcher,
 )
@@ -7,21 +10,46 @@ from models.customer_dna import (
 from models.evaluation_result import (
     EvaluationResult,
 )
+from mvc.catalog_loader import (
+    CatalogLoader,
+)
+from mvc.vehicle_catalog import (
+    MasterVehicleCatalog,
+)
 
 
 class EvaluateMethodology:
     """
     Implements the ACF Evaluate phase.
 
-    Compares the Customer DNA against
-    every available vehicle and produces
-    an EvaluationResult.
-
-    This phase performs evaluation only.
-    It does not make recommendations.
+    Customer Profile
+            ↓
+    Catalog Loader
+            ↓
+    Vehicle Discovery
+            ↓
+    Vehicle Matcher
+            ↓
+    Evaluation Result
     """
 
     def __init__(self):
+
+        self.catalog = (
+            MasterVehicleCatalog()
+        )
+
+        self.loader = (
+            CatalogLoader(
+                self.catalog
+            )
+        )
+
+        self.discovery = (
+            VehicleDiscovery(
+                self.catalog
+            )
+        )
 
         self.matcher = (
             VehicleMatcher()
@@ -29,13 +57,31 @@ class EvaluateMethodology:
 
     def evaluate(
         self,
+        customer_profile,
         customer_dna: CustomerDNA,
     ) -> EvaluationResult:
 
-        result = EvaluationResult()
+        # Temporary seed until AKR synchronization
+        self.loader.load()
 
-        evaluations = self.matcher.match(
-            customer_dna
+        candidates = (
+            self.discovery.discover(
+                customer_profile
+            )
+        )
+
+        evaluations = (
+            self.matcher.match(
+
+                customer_dna,
+
+                candidates,
+
+            )
+        )
+
+        result = (
+            EvaluationResult()
         )
 
         for evaluation in evaluations:

@@ -4,15 +4,17 @@ from ai.ai_gateway import AIGateway
 from consultation.consultation_context import (
     ConsultationContext,
 )
-from prompt.prompt_builder import PromptBuilder
+from prompt.prompt_builder import (
+    PromptBuilder,
+)
 
 
 class ConsultationEngine:
     """
     Coordinates the consultation.
 
-    Business logic is delegated to
-    the Automotive Consulting Framework.
+    The ACFEngine owns the consultation
+    business workflow.
     """
 
     def __init__(self):
@@ -53,21 +55,19 @@ class ConsultationEngine:
             user_message
         )
 
-        evaluation_result = (
-            self.acf.process(
+        acf_result = self.acf.process(
 
-                context,
+            context,
 
-                fact_repository,
+            fact_repository,
 
-            )
         )
 
-        if evaluation_result is not None:
+        if acf_result is not None:
 
             return (
 
-                evaluation_result,
+                acf_result,
 
                 context.customer_dna,
 

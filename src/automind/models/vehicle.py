@@ -1,57 +1,74 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
 class Vehicle:
     """
-    Represents one vehicle in the
-    AutoMind vehicle catalog.
+    Canonical Vehicle Identity.
+
+    This object represents the
+    permanent identity of a vehicle.
+
+    Dynamic automotive knowledge
+    belongs to AKR.
     """
 
-    id: str
+    # ----------------------------------
+    # Identity
+    # ----------------------------------
 
-    brand: str
+    vehicle_id: str
+
+    manufacturer: str
 
     model: str
 
-    variant: str
+    variant: str = ""
 
-    year: int
+    year: int | None = None
 
-    body_style: str
+    # ----------------------------------
+    # Classification
+    # ----------------------------------
 
-    fuel_type: str
+    body_style: str = ""
 
-    transmission: str
+    segment: str = ""
 
-    ex_showroom_price: float
+    fuel_type: str = ""
 
-    dimensions: dict[str, float] = field(
-        default_factory=dict
-    )
+    transmission: str = ""
 
-    specifications: dict = field(
-        default_factory=dict
-    )
+    drivetrain: str = ""
 
-    features: dict = field(
-        default_factory=dict
-    )
+    seating_capacity: int = 0
 
-    def name(self) -> str:
+    # ----------------------------------
+    # Metadata
+    # ----------------------------------
+
+    source: str = ""
+
+    confidence: int = 100
+
+    active: bool = True
+
+    # ----------------------------------
+
+    @property
+    def display_name(
+        self,
+    ) -> str:
+
+        if self.variant:
+
+            return (
+                f"{self.manufacturer} "
+                f"{self.model} "
+                f"{self.variant}"
+            )
 
         return (
-            f"{self.brand} "
-            f"{self.model} "
-            f"{self.variant}"
-        )
-
-    def get_dimension_score(
-        self,
-        dimension: str,
-    ) -> float:
-
-        return self.dimensions.get(
-            dimension,
-            50,
+            f"{self.manufacturer} "
+            f"{self.model}"
         )

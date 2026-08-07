@@ -1,0 +1,11 @@
+vehicle_id,manufacturer,model,variant,body_style,fuel_type,transmission,seating_capacity
+HYRYDER_G,Toyota,Hyryder,Hybrid G,SUV,Hybrid,Automatic,5
+XUV700_AX7,Mahindra,XUV700,AX7,SUV,Diesel,Automatic,7
+CRETA_SX,Hyundai,Creta,SX,SUV,Petrol,Automatic,5
+ELEVATE_ZX,Honda,Elevate,ZX,SUV,Petrol,CVT,5
+CITY_ZX,Honda,City,ZX,Sedan,Petrol,CVT,5
+VERNA_SX,Hyundai,Verna,SX,Sedan,Petrol,DCT,5
+SLAVIA_STYLE,Skoda,Slavia,Style,Sedan,Petrol,Automatic,5
+VIRTUS_GT,Volkswagen,Virtus,GT,Sedan,Petrol,DSG,5
+INNOVA_HYCROSS,Toyota,Innova Hycross,ZX Hybrid,MUV,Hybrid,e-CVT,7
+SCORPIO_N_Z8,Mahindra,Scorpio N,Z8,SUV,Diesel,Automatic,7
