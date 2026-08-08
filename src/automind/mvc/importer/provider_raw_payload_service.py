@@ -1,3 +1,8 @@
+from datetime import (
+    UTC,
+    datetime,
+)
+
 from mvc.database.session import (
     DatabaseSession,
 )
@@ -27,6 +32,12 @@ class ProviderRawPayloadService:
 
         try:
 
+            cleaned_payload = (
+                self._clean_payload(
+                    payload
+                )
+            )
+
             record = (
                 ProviderRawPayloadRecord(
 
@@ -34,7 +45,7 @@ class ProviderRawPayloadService:
 
                     provider_entity_id=provider_entity_id,
 
-                    payload=payload,
+                    payload=cleaned_payload,
 
                     payload_hash=payload_hash,
 
@@ -60,3 +71,140 @@ class ProviderRawPayloadService:
         finally:
 
             session.close()
+
+    def mark_processed(
+        self,
+        record_id: str,
+        status: str = "Processed",
+        notes: str = "",
+    ) -> None:
+
+        session = DatabaseSession.create()
+
+        try:
+
+            record = session.get(
+
+                ProviderRawPayloadRecord,
+
+                record_id,
+
+            )
+
+            if record is None:
+
+                return
+
+            record.processed = True
+
+            record.processing_status = (
+                status
+            )
+
+            record.processing_notes = (
+                notes
+            )
+
+            record.updated_at = (
+                datetime.now(
+                    UTC
+                )
+            )
+
+            session.commit()
+
+        finally:
+
+            session.close()
+
+    def mark_failed(
+        self,
+        record_id: str,
+        notes: str,
+    ) -> None:
+
+        session = DatabaseSession.create()
+
+        try:
+
+            record = session.get(
+
+                ProviderRawPayloadRecord,
+
+                record_id,
+
+            )
+
+            if record is None:
+
+                return
+
+            record.processed = False
+
+            record.processing_status = (
+                "Failed"
+            )
+
+            record.processing_notes = (
+                notes
+            )
+
+            record.updated_at = (
+                datetime.now(
+                    UTC
+                )
+            )
+
+            session.commit()
+
+        finally:
+
+            session.close()
+
+    def _clean_payload(
+        self,
+        value,
+    ):
+
+        import math
+
+        if isinstance(
+            value,
+            dict,
+        ):
+
+            return {
+
+                key: self._clean_payload(
+                    item
+                )
+
+                for key, item in value.items()
+
+            }
+
+        if isinstance(
+            value,
+            list,
+        ):
+
+            return [
+
+                self._clean_payload(
+                    item
+                )
+
+                for item in value
+
+            ]
+
+        if isinstance(
+            value,
+            float,
+        ) and math.isnan(
+            value
+        ):
+
+            return None
+
+        return value

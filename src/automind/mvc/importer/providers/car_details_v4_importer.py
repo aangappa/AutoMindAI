@@ -1,3 +1,6 @@
+import hashlib
+import json
+
 from pathlib import (
     Path,
 )
@@ -49,6 +52,12 @@ class CarDetailsV4Importer(
             dataframe.iterrows()
         ):
 
+            provider_external_id = (
+                self._generate_provider_id(
+                    record.to_dict()
+                )
+            )
+
             rows.append(
 
                 {
@@ -61,7 +70,7 @@ class CarDetailsV4Importer(
                         "car_details_v4",
 
                     "provider_external_id":
-                        "",
+                        provider_external_id,
 
                     #
                     # Canonical Vehicle
@@ -194,6 +203,86 @@ class CarDetailsV4Importer(
             )
 
         return rows
+
+    def _generate_provider_id(
+        self,
+        payload: dict,
+    ) -> str:
+
+        normalized_payload = (
+            self._normalize_for_hash(
+                payload
+            )
+        )
+
+        serialized_payload = json.dumps(
+
+            normalized_payload,
+
+            sort_keys=True,
+
+            separators=(
+                ",",
+                ":",
+            ),
+
+        )
+
+        return hashlib.sha256(
+            serialized_payload.encode(
+                "utf-8"
+            )
+        ).hexdigest()
+
+    def _normalize_for_hash(
+        self,
+        value,
+    ):
+
+        if isinstance(
+            value,
+            dict,
+        ):
+
+            return {
+
+                key: self._normalize_for_hash(
+                    item
+                )
+
+                for key, item in value.items()
+
+            }
+
+        if isinstance(
+            value,
+            list,
+        ):
+
+            return [
+
+                self._normalize_for_hash(
+                    item
+                )
+
+                for item in value
+
+            ]
+
+        if pd.isna(
+            value
+        ):
+
+            return None
+
+        if hasattr(
+            value,
+            "item",
+        ):
+
+            return value.item()
+
+        return value
 
     def _text(
         self,
