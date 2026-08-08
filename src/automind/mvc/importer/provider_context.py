@@ -25,6 +25,8 @@ class ProviderContext:
 
     batch_id: str = ""
 
+    canonical_level: str = "variant"
+
     imported_at: datetime = (
         datetime.now(
             UTC

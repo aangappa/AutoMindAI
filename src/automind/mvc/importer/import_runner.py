@@ -17,6 +17,7 @@ class ImportRunner:
         self,
         provider_name: str,
         csv_path: str,
+        canonical_level: str = "variant",
     ) -> None:
 
         importer = (
@@ -36,6 +37,8 @@ class ImportRunner:
             provider_version="1.0",
 
             source_url=csv_path,
+
+            canonical_level=canonical_level,
 
         )
 
@@ -114,5 +117,7 @@ if __name__ == "__main__":
             "vehicle_dataset/"
             "car details v4.csv"
         ),
+
+        canonical_level="variant",
 
     )

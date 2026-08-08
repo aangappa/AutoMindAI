@@ -70,11 +70,16 @@ class ImportPipeline:
 
                     row=row,
 
+                    canonical_level=(
+                        self.context.canonical_level
+                    ),
+
                 )
 
                 result.imported_records += 1
 
             except Exception as ex:
+
                 result.failed_records += 1
 
                 result.errors.append(

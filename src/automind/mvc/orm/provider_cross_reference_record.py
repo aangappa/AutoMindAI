@@ -5,9 +5,9 @@ from datetime import (
 from uuid import uuid4
 
 from sqlalchemy import (
+    CheckConstraint,
     DateTime,
     Float,
-    ForeignKey,
     JSON,
     String,
     UniqueConstraint,
@@ -27,9 +27,15 @@ class ProviderCrossReferenceRecord(
     Base,
 ):
     """
-    Maps AutoMind canonical
-    variants to external
-    provider identifiers.
+    Maps provider identifiers to
+    AutoMind canonical entities.
+
+    The canonical entity may be:
+
+    make
+    model
+    generation
+    variant
     """
 
     __tablename__ = (
@@ -50,6 +56,23 @@ class ProviderCrossReferenceRecord(
 
         ),
 
+        CheckConstraint(
+
+            """
+            canonical_type IN (
+                'make',
+                'model',
+                'generation',
+                'variant'
+            )
+            """,
+
+            name=(
+                "ck_canonical_type"
+            ),
+
+        ),
+
     )
 
     id: Mapped[str] = mapped_column(
@@ -58,14 +81,6 @@ class ProviderCrossReferenceRecord(
         default=lambda: str(
             uuid4()
         ),
-    )
-
-    variant_id: Mapped[str] = mapped_column(
-        String(36),
-        ForeignKey(
-            "variants.id",
-        ),
-        nullable=False,
     )
 
     provider_name: Mapped[str] = mapped_column(
@@ -77,6 +92,20 @@ class ProviderCrossReferenceRecord(
         str
     ] = mapped_column(
         String(255),
+        nullable=False,
+    )
+
+    canonical_type: Mapped[
+        str
+    ] = mapped_column(
+        String(20),
+        nullable=False,
+    )
+
+    canonical_id: Mapped[
+        str
+    ] = mapped_column(
+        String(36),
         nullable=False,
     )
 

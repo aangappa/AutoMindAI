@@ -15,11 +15,16 @@ class ProviderCrossReferenceService:
     """
     Persists provider-to-canonical
     vehicle mappings.
+
+    A provider mapping may point to
+    a make, model, generation,
+    or variant.
     """
 
     def save(
         self,
-        variant_id: str,
+        canonical_type: str,
+        canonical_id: str,
         provider_name: str,
         provider_external_id: str,
         provider_version: str = "",
@@ -49,8 +54,12 @@ class ProviderCrossReferenceService:
 
             if record is not None:
 
-                record.variant_id = (
-                    variant_id
+                record.canonical_type = (
+                    canonical_type
+                )
+
+                record.canonical_id = (
+                    canonical_id
                 )
 
                 record.provider_version = (
@@ -76,17 +85,33 @@ class ProviderCrossReferenceService:
             record = (
                 ProviderCrossReferenceRecord(
 
-                    variant_id=variant_id,
+                    canonical_type=(
+                        canonical_type
+                    ),
 
-                    provider_name=provider_name,
+                    canonical_id=(
+                        canonical_id
+                    ),
 
-                    provider_external_id=provider_external_id,
+                    provider_name=(
+                        provider_name
+                    ),
 
-                    provider_version=provider_version,
+                    provider_external_id=(
+                        provider_external_id
+                    ),
 
-                    provider_metadata=provider_metadata,
+                    provider_version=(
+                        provider_version
+                    ),
 
-                    confidence=confidence,
+                    provider_metadata=(
+                        provider_metadata
+                    ),
+
+                    confidence=(
+                        confidence
+                    ),
 
                 )
             )
@@ -105,4 +130,4 @@ class ProviderCrossReferenceService:
 
         finally:
 
-            session.close() 
+            session.close()
