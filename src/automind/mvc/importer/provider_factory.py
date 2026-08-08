@@ -10,6 +10,10 @@ from mvc.importer.providers.vehiclesdb_importer import (
     VehiclesDBImporter,
 )
 
+from mvc.importer.providers.shrey_importer import (
+    ShreyImporter,
+)
+
 
 class ProviderFactory:
     """
@@ -32,6 +36,12 @@ class ProviderFactory:
         if provider_name == "vehiclesdb":
 
             return VehiclesDBImporter(
+                csv_path
+            )
+
+        if provider_name == "shrey_mishra":
+
+            return ShreyImporter(
                 csv_path
             )
 
